@@ -66,6 +66,9 @@ cmcc,rax3000m)
 		;;
 	esac
 	;;
+comfast,cf-e393ax)
+	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x80000"
+	;;
 glinet,gl-mt2500|\
 glinet,gl-mt6000)
 	local envdev=$(find_mmc_part "u-boot-env")
@@ -75,7 +78,7 @@ glinet,gl-mt3000)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x80000" "0x20000"
 	;;
 h3c,magic-nx30-pro|\
-jcg,q30|\
+jcg,q30-pro|\
 qihoo,360t7|\
 tplink,tl-xdr4288|\
 tplink,tl-xdr6086|\
@@ -100,8 +103,7 @@ jdcloud,re-cp-03)
 	ubootenv_add_uci_config "$envdev" "0x40000" "0x40000" "0x40000" "1"
 	;;
 livinet,zr-3020|\
-livinet,zr-3020-ubootmod|\
-qihoo,360t7-ubootmod)
+livinet,zr-3020-ubootmod)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x20000" "1"
 	;;
 mercusys,mr90x-v1|\
@@ -113,9 +115,7 @@ ubnt,unifi-6-plus)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x80000" "0x10000"
 	;;
 xiaomi,mi-router-ax3000t|\
-xiaomi,mi-router-wr30u-112m-nmbm|\
 xiaomi,mi-router-wr30u-stock|\
-xiaomi,redmi-router-ax6000|\
 xiaomi,redmi-router-ax6000-stock)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x20000"
 	ubootenv_add_uci_sys_config "/dev/mtd2" "0x0" "0x10000" "0x20000"

@@ -421,6 +421,30 @@ define Device/cmcc_rax3000m
 endef
 TARGET_DEVICES += cmcc_rax3000m
 
+define Device/comfast_cf-e393ax
+  DEVICE_VENDOR := Comfast
+  DEVICE_MODEL := CF-E393AX
+  DEVICE_DTS := mt7981a-comfast-cf-e393ax
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTC_FLAGS := --pad 4096
+  DEVICE_DTS_LOADADDR := 0x43f00000
+  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
+  KERNEL_LOADADDR := 0x44000000
+  KERNEL = kernel-bin | lzma | \
+       fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+       fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGES := sysupgrade.bin factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += comfast_cf-e393ax
+
 define Device/confiabits_mt7981
   DEVICE_VENDOR := Confiabits
   DEVICE_MODEL := MT7981
@@ -574,18 +598,15 @@ define Device/imou_lc-hx3001-ubootmod
 endef
 TARGET_DEVICES += imou_lc-hx3001-ubootmod
 
-define Device/jcg_q30
+define Device/jcg_q30-pro
   DEVICE_VENDOR := JCG
-  DEVICE_MODEL := Q30
-  DEVICE_VARIANT := (OpenWrt U-Boot layout)
+  DEVICE_MODEL := Q30 PRO
   DEVICE_ALT0_VENDOR := JCG
-  DEVICE_ALT0_MODEL := Q30 Pro
-  DEVICE_ALT0_VARIANT := (OpenWrt U-Boot layout)
+  DEVICE_ALT0_MODEL := Q30
   DEVICE_ALT1_VENDOR := CMCC
   DEVICE_ALT1_MODEL := MR3000D-CIq
-  DEVICE_ALT1_VARIANT := (OpenWrt U-Boot layout)
-  SUPPORTED_DEVICES += jcg,q30-pro
-  DEVICE_DTS := mt7981b-jcg-q30
+  SUPPORTED_DEVICES += jcg,q30
+  DEVICE_DTS := mt7981b-jcg-q30-pro
   DEVICE_DTS_DIR := ../dts
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
@@ -602,37 +623,9 @@ define Device/jcg_q30
   DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
   ARTIFACTS := preloader.bin bl31-uboot.fip
   ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
-  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot jcg_q30
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot jcg_q30-pro
 endef
-TARGET_DEVICES += jcg_q30
-
-define Device/jcg_q30-ubootmod
-  DEVICE_VENDOR := JCG
-  DEVICE_MODEL := Q30
-  DEVICE_VARIANT := (custom U-Boot layout)
-  DEVICE_ALT0_VENDOR := JCG
-  DEVICE_ALT0_MODEL := Q30 Pro
-  DEVICE_ALT0_VARIANT := (custom U-Boot layout)
-  DEVICE_ALT1_VENDOR := CMCC
-  DEVICE_ALT1_MODEL := MR3000D-CIq
-  DEVICE_ALT1_VARIANT := (custom U-Boot layout)
-  DEVICE_DTS := mt7981b-jcg-q30-ubootmod
-  DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 113152k
-  KERNEL_IN_UBI := 1
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  KERNEL = kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
-  KERNEL_INITRAMFS = kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
-endef
-TARGET_DEVICES += jcg_q30-ubootmod
+TARGET_DEVICES += jcg_q30-pro
 
 define Device/jdcloud_re-cp-03
   DEVICE_VENDOR := JDCloud
@@ -887,7 +880,6 @@ TARGET_DEVICES += netgear_wax220
 define Device/qihoo_360t7
   DEVICE_VENDOR := Qihoo
   DEVICE_MODEL := 360T7
-  DEVICE_VARIANT := (OpenWrt U-Boot layout)
   DEVICE_DTS := mt7981b-qihoo-360t7
   DEVICE_DTS_DIR := ../dts
   UBINIZE_OPTS := -E 5
@@ -908,29 +900,6 @@ define Device/qihoo_360t7
   ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot qihoo_360t7
 endef
 TARGET_DEVICES += qihoo_360t7
-
-define Device/qihoo_360t7-ubootmod
-  DEVICE_VENDOR := Qihoo
-  DEVICE_MODEL := 360T7
-  DEVICE_VARIANT := (custom U-Boot layout)
-  DEVICE_DTS := mt7981b-qihoo-360t7-ubootmod
-  DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
-  SUPPORTED_DEVICES += qihoo,360-t7-ubootmod
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 65536k
-  KERNEL_IN_UBI := 1
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  KERNEL = kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
-  KERNEL_INITRAMFS = kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd
-endef
-TARGET_DEVICES += qihoo_360t7-ubootmod
 
 define Device/routerich_ax3000
   DEVICE_VENDOR := Routerich
@@ -1000,6 +969,7 @@ TARGET_DEVICES += ubnt_unifi-6-plus
 define Device/xiaomi_mi-router-ax3000t
   DEVICE_VENDOR := Xiaomi
   DEVICE_MODEL := Mi Router AX3000T
+  DEVICE_VARIANT := (stock layout)
   DEVICE_DTS := mt7981b-xiaomi-mi-router-ax3000t
   DEVICE_DTS_DIR := ../dts
   UBINIZE_OPTS := -E 5
@@ -1016,7 +986,8 @@ TARGET_DEVICES += xiaomi_mi-router-ax3000t
 
 define Device/xiaomi_mi-router-ax3000t-ubootmod
   DEVICE_VENDOR := Xiaomi
-  DEVICE_MODEL := Mi Router AX3000T (OpenWrt U-Boot layout)
+  DEVICE_MODEL := Mi Router AX3000T
+  DEVICE_VARIANT := (OpenWrt U-Boot layout)
   DEVICE_DTS := mt7981b-xiaomi-mi-router-ax3000t-ubootmod
   DEVICE_DTS_DIR := ../dts
   UBINIZE_OPTS := -E 5
@@ -1041,28 +1012,6 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 endif
 endef
 TARGET_DEVICES += xiaomi_mi-router-ax3000t-ubootmod
-
-define Device/xiaomi_mi-router-wr30u-112m-nmbm
-  DEVICE_VENDOR := Xiaomi
-  DEVICE_MODEL := Mi Router WR30U
-  DEVICE_VARIANT := (custom U-Boot layout)
-  DEVICE_DTS := mt7981b-xiaomi-mi-router-wr30u-112m-nmbm
-  DEVICE_DTS_DIR := ../dts
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 114688k
-  KERNEL_IN_UBI := 1
-  DEVICE_PACKAGES := kmod-mt7981-firmware mt7981-wo-firmware
-ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
-  ARTIFACTS := initramfs-factory.ubi
-  ARTIFACT/initramfs-factory.ubi := append-image-stage initramfs-kernel.bin | ubinize-kernel
-endif
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-endef
-TARGET_DEVICES += xiaomi_mi-router-wr30u-112m-nmbm
 
 define Device/xiaomi_mi-router-wr30u-stock
   DEVICE_VENDOR := Xiaomi
@@ -1110,25 +1059,6 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
 endif
 endef
 TARGET_DEVICES += xiaomi_mi-router-wr30u-ubootmod
-
-define Device/xiaomi_redmi-router-ax6000
-  DEVICE_VENDOR := Xiaomi
-  DEVICE_MODEL := Redmi Router AX6000
-  DEVICE_VARIANT := (custom U-Boot layout)
-  DEVICE_DTS := mt7986a-xiaomi-redmi-router-ax6000
-  DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-leds-ws2812b kmod-mt7986-firmware mt7986-wo-firmware
-  KERNEL_LOADADDR := 0x48000000
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 112640k
-  KERNEL_IN_UBI := 1
-  IMAGES += factory.bin
-  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-endef
-TARGET_DEVICES += xiaomi_redmi-router-ax6000
 
 define Device/xiaomi_redmi-router-ax6000-stock
   DEVICE_VENDOR := Xiaomi

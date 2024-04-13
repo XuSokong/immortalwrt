@@ -84,6 +84,9 @@ platform_do_upgrade() {
 	bananapi,bpi-r3-mini|\
 	bananapi,bpi-r4|\
 	nokia,ea0326gmp|\
+	tplink,tl-xdr4288|\
+	tplink,tl-xdr6086|\
+	tplink,tl-xdr6088|\
 	xiaomi,redmi-router-ax6000-ubootmod)
 		[ -e /dev/fit0 ] && fitblk /dev/fit0
 		[ -e /dev/fitrw ] && fitblk /dev/fitrw
@@ -131,10 +134,8 @@ platform_do_upgrade() {
 	h3c,magic-nx30-pro|\
 	jcg,q30-pro|\
 	mediatek,mt7981-rfb|\
+	netcore,n60|\
 	qihoo,360t7|\
-	tplink,tl-xdr4288|\
-	tplink,tl-xdr6086|\
-	tplink,tl-xdr6088|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod)
 		CI_KERNPART="fit"
@@ -164,7 +165,7 @@ platform_do_upgrade() {
 		CI_KERNPART="fit"
 		CI_ROOTPART="ubi_rootfs"
 		nand_do_upgrade "$1"
-                ;;
+		;;
 	unielec,u7981-01*)
 		local rootdev="$(cmdline_get_var root)"
 		rootdev="${rootdev##*/}"
@@ -220,6 +221,8 @@ platform_copy_config() {
 	acer,predator-w6|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt6000|\
+	glinet,gl-x3000|\
+	glinet,gl-xe3000|\
 	jdcloud,re-cp-03|\
 	ubnt,unifi-6-plus)
 		emmc_copy_config
@@ -239,15 +242,6 @@ platform_copy_config() {
 			emmc_copy_config
 			;;
 		esac
-		;;
-	acer,predator-w6|\
-	glinet,gl-mt2500|\
-	glinet,gl-mt6000|\
-	glinet,gl-x3000|\
-	glinet,gl-xe3000|\
-	jdcloud,re-cp-03|\
-	ubnt,unifi-6-plus)
-		emmc_copy_config
 		;;
 	esac
 }

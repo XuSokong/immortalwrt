@@ -39,11 +39,11 @@ define KernelPackage/bluetooth
 	CONFIG_BT_RFCOMM \
 	CONFIG_BT_BNEP \
 	CONFIG_BT_HCIBTUSB \
-	CONFIG_BT_HCIBTUSB_BCM=n \
+	CONFIG_BT_HCIBTUSB_BCM=y \
 	CONFIG_BT_HCIBTUSB_MTK=y \
 	CONFIG_BT_HCIBTUSB_RTL=y \
 	CONFIG_BT_HCIUART \
-	CONFIG_BT_HCIUART_BCM=n \
+	CONFIG_BT_HCIUART_BCM=y \
 	CONFIG_BT_HCIUART_INTEL=n \
 	CONFIG_BT_HCIUART_H4 \
 	CONFIG_BT_HCIUART_NOKIA=n \
@@ -56,6 +56,7 @@ define KernelPackage/bluetooth
 	$(LINUX_DIR)/net/bluetooth/hidp/hidp.ko \
 	$(LINUX_DIR)/drivers/bluetooth/hci_uart.ko \
 	$(LINUX_DIR)/drivers/bluetooth/btusb.ko \
+	$(LINUX_DIR)/drivers/bluetooth/btbcm.ko \
 	$(LINUX_DIR)/drivers/bluetooth/btintel.ko \
 	$(LINUX_DIR)/drivers/bluetooth/btrtl.ko \
 	$(LINUX_DIR)/drivers/bluetooth/btmtk.ko@ge5.17
@@ -572,11 +573,24 @@ endef
 $(eval $(call KernelPackage,bcma))
 
 
+define KernelPackage/mfd
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Multifunction device drivers
+  HIDDEN:=1
+  KCONFIG:=CONFIG_MFD_CORE
+  FILES:=$(LINUX_DIR)/drivers/mfd/mfd-core.ko
+  AUTOLOAD:=$(call AutoLoad,10,mfd-core)
+endef
+
+$(eval $(call KernelPackage,mfd))
+
+
 define KernelPackage/mtdtests
   SUBMENU:=$(OTHER_MENU)
   TITLE:=MTD subsystem tests
   KCONFIG:=CONFIG_MTD_TESTS
   FILES:=\
+	$(LINUX_DIR)/drivers/mtd/tests/mtd_nandbiterrs.ko \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_nandecctest.ko \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_oobtest.ko \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_pagetest.ko \
@@ -584,6 +598,7 @@ define KernelPackage/mtdtests
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_speedtest.ko \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_stresstest.ko \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_subpagetest.ko \
+	$(LINUX_DIR)/drivers/mtd/tests/mtd_test.ko@ge6.1 \
 	$(LINUX_DIR)/drivers/mtd/tests/mtd_torturetest.ko
 endef
 

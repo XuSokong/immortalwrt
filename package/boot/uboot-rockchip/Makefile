@@ -170,6 +170,13 @@ define U-Boot/rk3566/Default
   TPL:=$(RK3566_TPL)
 endef
 
+define U-Boot/nanopi-r3s-rk3566
+  $(U-Boot/rk3566/Default)
+  NAME:=NanoPi R3S
+  BUILD_DEVICES:= \
+    friendlyarm_nanopi-r3s
+endef
+
 define U-Boot/radxa-cm3-io-rk3566
   $(U-Boot/rk3566/Default)
   NAME:=CM3 IO
@@ -227,6 +234,13 @@ define U-Boot/lyt-t68m-rk3568
   NAME:=LYT T68M
   BUILD_DEVICES:= \
     lyt_t68m
+endef
+
+define U-Boot/mmbox-anas3035-rk3568
+  $(U-Boot/rk3568/Default)
+  NAME:=MMBOX ANAS3035
+  BUILD_DEVICES:= \
+    mmbox_anas3035
 endef
 
 define U-Boot/mrkaio-m68s-rk3568
@@ -386,6 +400,7 @@ UBOOT_TARGETS := \
   roc-cc-rk3328 \
   rock-pi-e-rk3328 \
   rock64-rk3328 \
+  nanopi-r3s-rk3566 \
   radxa-cm3-io-rk3566 \
   radxa-zero-3-rk3566 \
   rock-3c-rk3566 \
@@ -393,6 +408,7 @@ UBOOT_TARGETS := \
   fastrhino-r66s-rk3568 \
   fastrhino-r68s-rk3568 \
   lyt-t68m-rk3568 \
+  mmbox-anas3035-rk3568 \
   mrkaio-m68s-rk3568 \
   nanopi-r5c-rk3568 \
   nanopi-r5s-rk3568 \

@@ -968,6 +968,7 @@ define Device/nexx_wt3020-8m
   DEVICE_VARIANT := 8M
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci
   SUPPORTED_DEVICES += wt3020 wt3020-8M
+  DEFAULT := n
 endef
 TARGET_DEVICES += nexx_wt3020-8m
 
@@ -1339,6 +1340,16 @@ define Device/trendnet_tew-810dr
 endef
 TARGET_DEVICES += trendnet_tew-810dr
 
+define Device/trendnet_tha103ac
+  SOC := mt7620a
+  DEVICE_PACKAGES := kmod-mt76x0e rssileds
+  DEVICE_VENDOR := TRENDnet
+  DEVICE_MODEL := THA-103AC
+  IMAGE_SIZE := 7872k
+  SUPPORTED_DEVICES += mt7620a_mt7610e
+endef
+TARGET_DEVICES += trendnet_tha103ac
+
 define Device/vonets_var11n-300
   SOC := mt7620n
   IMAGE_SIZE := 3776k
@@ -1610,6 +1621,7 @@ define Device/zyxel_keenetic-omni
   IMAGE/factory.bin := $$(sysupgrade_bin) | pad-to 64k | check-size | \
 	zyimage -d 4882 -v "ZyXEL Keenetic Omni"
   SUPPORTED_DEVICES += kn_rc
+  DEFAULT := n
 endef
 TARGET_DEVICES += zyxel_keenetic-omni
 
@@ -1623,6 +1635,7 @@ define Device/zyxel_keenetic-omni-ii
   IMAGE/factory.bin := $$(sysupgrade_bin) | pad-to 64k | check-size | \
 	zyimage -d 2102034 -v "ZyXEL Keenetic Omni II"
   SUPPORTED_DEVICES += kn_rf
+  DEFAULT := n
 endef
 TARGET_DEVICES += zyxel_keenetic-omni-ii
 

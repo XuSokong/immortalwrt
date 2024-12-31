@@ -13,6 +13,28 @@ V4L2_USB_DIR=usb
 V4L2_MEM2MEM_DIR=platform
 
 #
+# Media
+#
+define KernelPackage/media-controller
+  SUBMENU:=$(VIDEO_MENU)
+  TITLE:=Media Controller API
+  KCONFIG:= \
+	CONFIG_MEDIA_SUPPORT \
+	CONFIG_MEDIA_CONTROLLER=y
+  FILES:= \
+	$(LINUX_DIR)/drivers/media/mc/mc.ko
+  AUTOLOAD:=$(call AutoProbe,mc)
+endef
+
+define KernelPackage/media-controller/description
+ Kernel modules for media controller API used to query media devices
+ internal topology and configure it dynamically.
+endef
+
+$(eval $(call KernelPackage,media-controller))
+
+
+#
 # Video Display
 #
 
@@ -345,6 +367,38 @@ endef
 $(eval $(call KernelPackage,drm-gem-shmem-helper))
 
 
+define KernelPackage/drm-dma-helper
+  SUBMENU:=$(VIDEO_MENU)
+  HIDDEN:=1
+  TITLE:=GEM DMA helper functions
+  DEPENDS:=@DISPLAY_SUPPORT +kmod-drm-kms-helper
+  KCONFIG:=CONFIG_DRM_GEM_DMA_HELPER
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/drm_dma_helper.ko
+  AUTOLOAD:=$(call AutoProbe,drm_dma_helper)
+endef
+
+define KernelPackage/drm-dma-helper/description
+  GEM DMA helper functions.
+endef
+
+$(eval $(call KernelPackage,drm-dma-helper))
+
+define KernelPackage/drm-mipi-dbi
+  SUBMENU:=$(VIDEO_MENU)
+  HIDDEN:=1
+  TITLE:=MIPI DBI helpers
+  DEPENDS:=@DISPLAY_SUPPORT +kmod-backlight +kmod-drm-kms-helper
+  KCONFIG:=CONFIG_DRM_MIPI_DBI
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/drm_mipi_dbi.ko
+  AUTOLOAD:=$(call AutoProbe,drm_mipi_dbi)
+endef
+
+define KernelPackage/drm-mipi-dbi/description
+  MIPI Display Bus Interface (DBI) LCD controller support.
+endef
+
+$(eval $(call KernelPackage,drm-mipi-dbi))
+
 define KernelPackage/drm-ttm
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=GPU memory management subsystem
@@ -440,6 +494,49 @@ endef
 
 $(eval $(call KernelPackage,drm-amdgpu))
 
+define KernelPackage/drm-i915
+  SUBMENU:=$(VIDEO_MENU)
+  TITLE:=Intel i915 DRM support
+  DEPENDS:=@(TARGET_x86_64||TARGET_x86_generic||TARGET_x86_legacy) \
+	@DISPLAY_SUPPORT +kmod-backlight +kmod-drm-ttm \
+	+kmod-drm-ttm-helper +kmod-drm-kms-helper +kmod-i2c-algo-bit +i915-firmware-dmc \
+	+kmod-drm-display-helper +kmod-drm-buddy +kmod-acpi-video \
+	+kmod-drm-exec +kmod-drm-suballoc-helper
+  KCONFIG:=CONFIG_DRM_I915 \
+	CONFIG_DRM_I915_CAPTURE_ERROR=y \
+	CONFIG_DRM_I915_COMPRESS_ERROR=y \
+	CONFIG_DRM_I915_DEBUG=n \
+	CONFIG_DRM_I915_DEBUG_GUC=n \
+	CONFIG_DRM_I915_DEBUG_MMIO=n \
+	CONFIG_DRM_I915_DEBUG_RUNTIME_PM=n \
+	CONFIG_DRM_I915_DEBUG_VBLANK_EVADE=n \
+	CONFIG_DRM_I915_FENCE_TIMEOUT=10000 \
+	CONFIG_DRM_I915_FORCE_PROBE="" \
+	CONFIG_DRM_I915_HEARTBEAT_INTERVAL=2500 \
+	CONFIG_DRM_I915_LOW_LEVEL_TRACEPOINTS=n \
+	CONFIG_DRM_I915_MAX_REQUEST_BUSYWAIT=8000 \
+	CONFIG_DRM_I915_PREEMPT_TIMEOUT=640 \
+	CONFIG_DRM_I915_PREEMPT_TIMEOUT_COMPUTE=7500 \
+	CONFIG_DRM_I915_REQUEST_TIMEOUT=20000 \
+	CONFIG_DRM_I915_SELFTEST=n \
+	CONFIG_DRM_I915_STOP_TIMEOUT=100 \
+	CONFIG_DRM_I915_SW_FENCE_CHECK_DAG=n \
+	CONFIG_DRM_I915_SW_FENCE_DEBUG_OBJECTS=n \
+	CONFIG_DRM_I915_TIMESLICE_DURATION=1 \
+	CONFIG_DRM_I915_USERFAULT_AUTOSUSPEND=250 \
+	CONFIG_DRM_I915_USERPTR=y \
+	CONFIG_DRM_I915_WERROR=n \
+	CONFIG_FB_INTEL=n
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/i915/i915.ko
+  AUTOLOAD:=$(call AutoProbe,i915)
+endef
+
+define KernelPackage/drm-i915/description
+  Direct Rendering Manager (DRM) support for Intel GPU
+endef
+
+$(eval $(call KernelPackage,drm-i915))
+
 
 define KernelPackage/drm-imx
   SUBMENU:=$(VIDEO_MENU)
@@ -521,7 +618,7 @@ $(eval $(call KernelPackage,drm-imx-ldb))
 define KernelPackage/drm-lima
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=Mali-4xx GPU support
-  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm +!LINUX_5_15:kmod-drm-gem-shmem-helper
+  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm +kmod-drm-gem-shmem-helper
   KCONFIG:= \
 	CONFIG_DRM_VGEM \
 	CONFIG_DRM_GEM_CMA_HELPER=y \
@@ -542,7 +639,7 @@ $(eval $(call KernelPackage,drm-lima))
 define KernelPackage/drm-panfrost
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=DRM support for ARM Mali Midgard/Bifrost GPUs
-  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm +!LINUX_5_15:kmod-drm-gem-shmem-helper
+  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm +kmod-drm-gem-shmem-helper
   KCONFIG:=CONFIG_DRM_PANFROST
   FILES:= \
 	$(LINUX_DIR)/drivers/gpu/drm/panfrost/panfrost.ko \
@@ -560,7 +657,8 @@ $(eval $(call KernelPackage,drm-panfrost))
 define KernelPackage/drm-panthor
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=DRM support for ARM Mali CSF-based GPUs
-  DEPENDS:=@TARGET_rockchip +kmod-drm +kmod-drm-exec +kmod-drm-gem-shmem-helper
+  DEPENDS:=@TARGET_rockchip +kmod-drm +kmod-drm-exec +kmod-drm-gem-shmem-helper \
+	panthor-firmware
   KCONFIG:= \
 	CONFIG_DRM_GPUVM \
 	CONFIG_DRM_PANTHOR
@@ -576,6 +674,24 @@ define KernelPackage/drm-panthor/description
 endef
 
 $(eval $(call KernelPackage,drm-panthor))
+
+define KernelPackage/drm-panel-mipi-dbi
+  SUBMENU:=$(VIDEO_MENU)
+  TITLE:=Generic MIPI DBI LCD panel
+  DEPENDS:=+kmod-drm-mipi-dbi +kmod-drm-dma-helper
+  KCONFIG:=CONFIG_DRM_PANEL_MIPI_DBI \
+	CONFIG_DRM_FBDEV_EMULATION=y \
+	CONFIG_DRM_FBDEV_OVERALLOC=100
+  FILES:= \
+	$(LINUX_DIR)/drivers/gpu/drm/tiny/panel-mipi-dbi.ko
+  AUTOLOAD:=$(call AutoProbe,panel-mipi-dbi)
+endef
+
+define KernelPackage/drm-panel-mipi-dbi/description
+  Generic driver for MIPI Alliance Display Bus Interface
+endef
+
+$(eval $(call KernelPackage,drm-panel-mipi-dbi))
 
 define KernelPackage/drm-radeon
   SUBMENU:=$(VIDEO_MENU)
@@ -601,9 +717,8 @@ $(eval $(call KernelPackage,drm-radeon))
 define KernelPackage/video-core
   SUBMENU:=$(VIDEO_MENU)
   TITLE=Video4Linux support
-  DEPENDS:=+PACKAGE_kmod-i2c-core:kmod-i2c-core
+  DEPENDS:=+PACKAGE_kmod-i2c-core:kmod-i2c-core +kmod-media-controller
   KCONFIG:= \
-	CONFIG_MEDIA_SUPPORT \
 	CONFIG_MEDIA_CAMERA_SUPPORT=y \
 	CONFIG_VIDEO_DEV \
 	CONFIG_V4L_PLATFORM_DRIVERS=y \
@@ -659,6 +774,25 @@ endef
 
 $(eval $(call KernelPackage,video-videobuf2))
 
+define KernelPackage/video-async
+  TITLE:=V4L2 ASYNC support
+  KCONFIG:=CONFIG_V4L2_ASYNC
+  FILES:=$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/v4l2-async.ko
+  $(call AddDepends/video)
+  AUTOLOAD:=$(call AutoProbe,v4l2-async)
+endef
+
+$(eval $(call KernelPackage,video-async))
+
+define KernelPackage/video-fwnode
+  TITLE:=V4L2 FWNODE support
+  KCONFIG:=CONFIG_V4L2_FWNODE
+  FILES:=$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/v4l2-fwnode.ko
+  $(call AddDepends/video,+kmod-video-async)
+  AUTOLOAD:=$(call AutoProbe,v4l2-fwnode)
+endef
+
+$(eval $(call KernelPackage,video-fwnode))
 
 define KernelPackage/video-cpia2
   TITLE:=CPIA2 video driver

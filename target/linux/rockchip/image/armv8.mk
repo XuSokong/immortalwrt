@@ -134,6 +134,15 @@ define Device/friendlyarm_nanopi-r2s
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r2s
 
+define Device/friendlyarm_nanopi-r3s
+  DEVICE_VENDOR := FriendlyARM
+  DEVICE_MODEL := NanoPi R3S
+  SOC := rk3566
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-r8168
+endef
+TARGET_DEVICES += friendlyarm_nanopi-r3s
+
 define Device/friendlyarm_nanopi-r4s
   DEVICE_VENDOR := FriendlyARM
   DEVICE_MODEL := NanoPi R4S
@@ -236,6 +245,17 @@ define Device/lyt_t68m
   DEVICE_PACKAGES := kmod-r8125 kmod-mt7921e wpad-openssl
 endef
 TARGET_DEVICES += lyt_t68m
+
+define Device/mmbox_anas3035
+  DEVICE_VENDOR := MMBOX
+  DEVICE_MODEL := ANAS3035
+  SOC := rk3568
+  DEVICE_DTS := rockchip/rk3568-mmbox-anas3035
+  UBOOT_DEVICE_NAME := mmbox-anas3035-rk3568
+  BOOT_FLOW := pine64-img
+  DEVICE_PACKAGES := kmod-r8125 kmod-ata-ahci-dwc kmod-hwmon-pwmfan kmod-hwmon-drivetemp
+endef
+TARGET_DEVICES += mmbox_anas3035
 
 define Device/pine64_rock64
   DEVICE_VENDOR := Pine64

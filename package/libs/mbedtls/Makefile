@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mbedtls
-PKG_VERSION:=3.6.2
-PKG_RELEASE:=1
+PKG_VERSION:=3.6.6
+PKG_RELEASE:=2
 PKG_BUILD_FLAGS:=no-mips16 gc-sections no-lto
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL=https://github.com/Mbed-TLS/$(PKG_NAME)/releases/download/$(PKG_NAME)-$(PKG_VERSION)
-PKG_HASH:=8b54fb9bcf4d5a7078028e0520acddefb7900b3e66fec7f7175bb5b7d85ccdca
+PKG_HASH:=8fb65fae8dcae5840f793c0a334860a411f884cc537ea290ce1c52bb64ca007a
 
 PKG_LICENSE:=GPL-2.0-or-later
 PKG_LICENSE_FILES:=LICENSE
@@ -53,6 +53,7 @@ MBEDTLS_BUILD_OPTS_CIPHERS= \
   CONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED \
   CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED \
   CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED \
+  CONFIG_MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED \
   CONFIG_MBEDTLS_NIST_KW_C \
   CONFIG_MBEDTLS_RIPEMD160_C \
   CONFIG_MBEDTLS_RSA_NO_CRT \
@@ -79,6 +80,8 @@ MBEDTLS_BUILD_OPTS= \
   CONFIG_MBEDTLS_VERSION_FEATURES \
   CONFIG_MBEDTLS_PSA_CRYPTO_CLIENT \
   CONFIG_MBEDTLS_DEPRECATED_WARNING \
+  CONFIG_MBEDTLS_SHA256_USE_ARMV8_A_CRYPTO_IF_PRESENT \
+  CONFIG_MBEDTLS_SHA512_USE_A64_CRYPTO_IF_PRESENT \
   CONFIG_MBEDTLS_SSL_PROTO_TLS1_2 \
   CONFIG_MBEDTLS_SSL_PROTO_TLS1_3 \
   CONFIG_MBEDTLS_SSL_TLS1_3_COMPATIBILITY_MODE
@@ -131,10 +134,9 @@ This package contains mbedtls helper programs for private key and
 CSR generation (gen_key, cert_req)
 endef
 
-TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS))
-ifneq ($(CONFIG_MBEDTLS_AESCE_C),)
-  TARGET_CFLAGS := $(filter-out -march=%,$(TARGET_CFLAGS)) -march=armv8-a+crypto
-endif
+TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS)) \
+	-Wno-unterminated-string-initialization \
+	$(if $(findstring cortex-a53,$(CONFIG_CPU_TYPE)),-march=armv8-a)
 
 CMAKE_OPTIONS += \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
@@ -142,14 +144,14 @@ CMAKE_OPTIONS += \
 	-DENABLE_TESTING:Bool=OFF \
 	-DENABLE_PROGRAMS:Bool=ON
 
-define Build/Prepare
-       $(call Build/Prepare/Default)
+define Build/Configure
+	$(call Build/Configure/Default)
 
-       $(if $(strip $(foreach opt,$(MBEDTLS_BUILD_OPTS),$($(opt)))),
-	 $(foreach opt,$(MBEDTLS_BUILD_OPTS),
-	 $(PKG_BUILD_DIR)/scripts/config.py \
-	 -f $(PKG_BUILD_DIR)/include/mbedtls/mbedtls_config.h \
-	 $(if $($(opt)),set,unset) $(patsubst CONFIG_%,%,$(opt))),)
+	$(if $(strip $(foreach opt,$(MBEDTLS_BUILD_OPTS),$($(opt)))),
+		$(foreach opt,$(MBEDTLS_BUILD_OPTS),
+			$(PKG_BUILD_DIR)/scripts/config.py \
+			-f $(PKG_BUILD_DIR)/include/mbedtls/mbedtls_config.h \
+			$(if $($(opt)),set,unset) $(patsubst CONFIG_%,%,$(opt))),)
 endef
 
 define Build/InstallDev
